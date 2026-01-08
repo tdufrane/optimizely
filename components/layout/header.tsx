@@ -25,7 +25,9 @@ export async function Header({ locale }: { locale: string }) {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="text-xl font-bold lg:min-w-[150px]">
-            <Image src={logo ?? ''} width={50} height={50} alt="logo" />
+            {logo && (
+              <Image src={logo ?? ''} width={50} height={50} alt="logo" />
+            )}
           </Link>
           <nav className="hidden items-center gap-6 md:flex">
             {navItems?.map((navItem) => {
