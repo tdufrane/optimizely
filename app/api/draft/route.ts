@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   const key = searchParams.get('key')
   const ver = searchParams.get('ver')
   const loc = searchParams.get('loc')
-
+  alert("HERE I AM!")
   console.log('[Draft API] Preview request received:', { key, ver, loc, token: token ? '***' : null })
 
   if (!ver || !token || !key) {
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 
   const response = await optimizely.GetContentByKeyAndVersion(
     { key, ver },
-    { preview: false }
+    { preview: true }
   )
 
   if (response.errors) {
