@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 
   const response = await optimizely.GetContentByKeyAndVersion(
     { key, ver },
-    { preview: true }
+    { preview: false }
   )
 
   if (response.errors) {
