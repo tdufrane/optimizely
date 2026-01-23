@@ -14,19 +14,32 @@ export default async function HomePage(props: {
 }) {
   const isDraftModeEnabled = await checkDraftMode()
   if (!isDraftModeEnabled) {
+    console.error('[Draft Homepage] Draft mode not enabled')
     return notFound()
   }
 
   const { locale, version } = await props.params
+  console.log('[Draft Homepage] Loading:', { locale, version })
+
   const locales = getValidLocale(locale)
   const pageResponse = await optimizely.GetPreviewStartPage(
     { locales, version },
     { preview: true }
   )
+
+  console.log('[Draft Homepage] GraphQL response:', {
+    hasData: !!pageResponse.data,
+    hasStartPage: !!pageResponse.data?.StartPage,
+    hasItem: !!pageResponse.data?.StartPage?.item,
+    errors: pageResponse.errors
+  })
+
   const startPage = pageResponse.data?.StartPage?.item
   const blocks = (startPage?.blocks ?? []).filter(
     (block) => block !== null && block !== undefined
   )
+
+  console.log('[Draft Homepage] Rendering with', blocks.length, 'blocks')
 
   return (
     <div data-epi-edit="blocks">

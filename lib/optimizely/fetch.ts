@@ -60,6 +60,18 @@ const optimizelyFetch = async <Response, Variables = object>({
 
     const result = await response.json()
 
+    if (result.errors) {
+      console.error('[Optimizely Fetch] GraphQL errors:', result.errors)
+    }
+
+    if (!response.ok) {
+      console.error('[Optimizely Fetch] HTTP error:', {
+        status: response.status,
+        statusText: response.statusText,
+        errors: result.errors
+      })
+    }
+
     return {
       ...result,
       headers: response.headers,

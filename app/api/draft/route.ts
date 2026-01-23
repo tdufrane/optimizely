@@ -11,7 +11,10 @@ export async function GET(request: NextRequest) {
   const ver = searchParams.get('ver')
   const loc = searchParams.get('loc')
 
+  console.log('[Draft API] Preview request received:', { key, ver, loc, token: token ? '***' : null })
+
   if (!ver || !token || !key) {
+    console.error('[Draft API] Missing required params:', { ver: !!ver, token: !!token, key: !!key })
     return notFound()
   }
 
@@ -25,13 +28,25 @@ export async function GET(request: NextRequest) {
       .map((error) => error.message)
       .join(', ')
 
+    console.error('[Draft API] GraphQL errors:', errorsMessage)
     return new NextResponse(errorsMessage, { status: 401 })
   }
 
   const content = response.data?._Content?.item
   if (!content) {
-    return new NextResponse('Bad Request', { status: 400 })
+    console.error('[Draft API] No content found:', {
+      hasData: !!response.data,
+      hasContent: !!response.data?._Content,
+      hasItem: !!response.data?._Content?.item
+    })
+    return new NextResponse('Content not found - check console logs', { status: 400 })
   }
+
+  console.log('[Draft API] Content found:', {
+    type: content.__typename,
+    key: content._metadata?.key,
+    version: content._metadata?.version
+  })
   ;(await draftMode()).enable()
   let newUrl = ''
   if (content.__typename === '_Experience') {
@@ -54,5 +69,6 @@ export async function GET(request: NextRequest) {
     newUrl = `/${loc}/draft/${ver}/${hierarchicalUrlWithoutLocale}`
   }
 
+  console.log('[Draft API] Redirecting to:', newUrl)
   redirect(`${newUrl}`)
 }

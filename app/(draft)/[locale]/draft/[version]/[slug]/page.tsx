@@ -14,6 +14,7 @@ export default async function CmsPage(props: {
 }) {
   const isDraftModeEnabled = await checkDraftMode()
   if (!isDraftModeEnabled) {
+    console.error('[Draft CMS Page] Draft mode not enabled')
     return notFound()
   }
 
@@ -21,15 +22,27 @@ export default async function CmsPage(props: {
   const locales = getValidLocale(locale)
   const formattedSlug = `/${slug}`
 
+  console.log('[Draft CMS Page] Loading:', { locale, version, slug: formattedSlug })
+
   const pageResponse = await optimizely.getPreviewPageByURL(
     { locales, slug: formattedSlug, version },
     { preview: true }
   )
+
+  console.log('[Draft CMS Page] GraphQL response:', {
+    hasData: !!pageResponse.data,
+    hasCMSPage: !!pageResponse.data?.CMSPage,
+    hasItem: !!pageResponse.data?.CMSPage?.item,
+    errors: pageResponse.errors
+  })
+
   const page = pageResponse.data?.CMSPage?.item
 
   const blocks = (page?.blocks ?? []).filter(
     (block) => block !== null && block !== undefined
   )
+
+  console.log('[Draft CMS Page] Rendering with', blocks.length, 'blocks')
 
   return (
     <div className="container py-10" data-epi-edit="blocks">
